@@ -1,0 +1,11 @@
+diff -ur module-init-tools-3.2.2/backwards_compat.c module-init-tools-3.2.2-patched/backwards_compat.c
+--- module-init-tools-3.2.2/backwards_compat.c.orig	2018-08-18 18:57:17.973158170 +0100
++++ module-init-tools-3.2.2/backwards_compat.c	2018-08-18 18:57:38.148805215 +0100
+@@ -1,6 +1,6 @@
+ /* Simple backwards compat code to exec old version */
+ 
+-#ifndef CONFIG_NO_BACKWARDS_COMPAT
++#ifdef CONFIG_NO_BACKWARDS_COMPAT
+ 
+ #include <sys/types.h>
+ #include <sys/stat.h>
