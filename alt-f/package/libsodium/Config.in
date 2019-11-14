@@ -1,6 +1,0 @@
-config BR2_PACKAGE_LIBSODIUM
-	bool "libsodium"
-	help
-	  library for encryption, decryption, signatures, password hashing and more
-
-	  https://download.libsodium.org/doc/

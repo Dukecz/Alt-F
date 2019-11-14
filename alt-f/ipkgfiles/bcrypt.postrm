@@ -1,3 +1,0 @@
-#!/bin/sh
-
-find /usr/lib/python2.7/site-packages/bcrypt -name \*.py[co] | xargs rm -f

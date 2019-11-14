@@ -1,9 +1,0 @@
-Package: libffi
-Depends: ipkg
-Version: 3.2.1
-Description: A Portable Foreign Function Interface Library
-Architecture: arm
-Priority: optional
-Section: admin
-Source: https://sourceware.org/libffi
-Maintainer: jcard
