@@ -41,7 +41,7 @@ rm -f $upfile fw.sha1
 echo "done.</p>"
 busy_cursor_end
 
-supported="D-Link DNS-327L-Ax, DNS-320-Ax, DNS-320-Bx, DNS-320L-Ax, DNS-321-Ax, DNS-323-A1/B1/C1, DNS-325-Ax, Conceptronic CH3SNAS, Fujitsu-Siemens DUO 35-LR"
+supported="D-Link DNS-327L-Ax, DNS-320-Ax, DNR-322L-Ax, DNS-320-Bx, DNS-320L-Ax, DNS-321-Ax, DNS-323-A1/B1/C1, DNS-325-Ax, Conceptronic CH3SNAS, Fujitsu-Siemens DUO 35-LR"
 
 if test $st != "0"; then
 	rm -f kernel initramfs sqimage defaults
@@ -63,6 +63,7 @@ fi
 # DNS320-B		0		8			c			1		1		5
 # DNS320L		0		8			b			1		1		6
 # DNS327L		0		8			d			1		1		7
+# DNR322L		1		8			2			1		1		8
 # Alt-F-0.1B	1		2			3			4		5		0
 # Alt-F-0.1RC	7		1			1			1		4		0
 
@@ -75,10 +76,19 @@ done
 sig=${product_id}${custom_id}${model_id}${sub_id}
 brd=$(cat /tmp/board)
 
+# FIXME: temporary hack to distinguish the DNR-322L from the DNS-320
+if test $brd == "DNS-320-Ax"; then
+	IFMAC=$(nanddump -ql 2048 /dev/mtd4 | grep -E '..(:..){5}')
+	if test -z "$IFMAC"; then
+		brd="DNR-322L-Ax"
+	fi
+fi
+
 case "$sig" in
 	"08d1") ftype="DNS-327L-Ax" ;; # DNS-327L-rev-Ax
 	"0851"|"0852") ftype="DNS-325-Ax" ;; # DNS-325-rev-Ax
 	"0871"|"0872") ftype="DNS-320-Ax" ;; # DNS-320-rev-Ax
+	"1821") ftype="DNR-322L-Ax" ;; # DNR-322L-rev-Ax
 	"08c1") ftype="DNS-320-Bx" ;; # DNS-320-rev-B
 	"08b1") ftype="DNS-320L-Ax" ;; # DNS-320L-rev-A1
 	"a111"|"a112") ftype="DNS-321-Ax" ;; # DNS-321-rev-Ax
@@ -98,6 +108,7 @@ case "$brd" in
 	"DNS-327L-Ax") if test $ftype != "DNS-327L-Ax"; then notcomp=yes; fi ;;
 	"DNS-325-Ax") if test $ftype != "DNS-325-Ax"; then notcomp=yes; fi ;;
 	"DNS-320-Ax") if test $ftype != "DNS-320-Ax"; then notcomp=yes; fi ;;
+	"DNR-322L-Ax") if test $ftype != "DNR-322L-Ax"; then notcomp=yes; fi ;;
 	"DNS-321-Ax") if test $ftype != "DNS-321-Ax"; then notcomp=yes; fi ;;
 	"DNS-320-Bx"|"DNS-320L-Ax")
 		if test $ftype != "DNS-320-Bx" -a $ftype != "DNS-320L-Ax"; then notcomp=yes; fi ;;
@@ -126,7 +137,7 @@ else
 	flashfile="checked"
 fi
 
-if echo $brd | grep -qE "DNS-327L|DNS-325|DNS-320"; then
+if echo $brd | grep -qE "DNS-327L|DNS-325|DNS-320|DNR-322L"; then
 	try_dis="disabled"
 	recover_dis="disabled"
 fi

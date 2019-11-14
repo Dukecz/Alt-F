@@ -44,7 +44,7 @@ board=$(cat /tmp/board)
 model=${board%-*}
 case "$model" in
 	DNS-321|DNS-323) SoC=orion5x ;;
-	DNS-320|DNS-320L|DNS-325) SoC=kirkwood ;;
+	DNR-322L|DNS-320|DNS-320L|DNS-325) SoC=kirkwood ;;
 	DNS-327L) SoC=armmp ;;
 	*) echo "Unknown Debian installer architecture for $board"; exit 1 ;;
 esac
@@ -79,7 +79,7 @@ if test $# != 0 -a "$1" = "-chroot"; then
 elif test $# != 0 -a "$1" = "-kexec"; then
 
 	if test "$SoC" != "orion5x"; then
-		echo "Debian -kexec not working on DNS-320/DNS-320L/DNS-325/DNS-327, exiting."
+		echo "Debian -kexec not working on DNR-322L/DNS-320/DNS-320L/DNS-325/DNS-327, exiting."
 		exit 1
 	fi
 

@@ -98,7 +98,7 @@ add_disk() {
 	# sda-right: /sys/devices/soc/soc:internal-regs/d00a0000.sata/ata2/host1/target1:0:0/1:0:0:0
 
 		lhost="/host0/"; rhost="/host1/"
-		if grep -qE 'DNS-320-[AB]x|DNS-320L-Ax|DNS-325-Ax|DNS-327L-Ax' /tmp/board; then
+		if grep -qE 'DNR-322L-Ax|DNS-320-[AB]x|DNS-320L-Ax|DNS-325-Ax|DNS-327L-Ax' /tmp/board; then
 			lhost="/host1/"; rhost="/host0/"
 		elif grep -qE 'qemu' /tmp/board; then
 			lhost="/0:0:1:0"; rhost="/0:0:0:0"

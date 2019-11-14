@@ -15,7 +15,7 @@ echo "rcE: saving date and time to RTC"
 hwclock -wu
 
 # terminate dns320 daemons
-if echo "$board" | grep -qE "DNS-320|DNS-327"; then
+if echo "$board" | grep -qE "DNR-322L|DNS-320|DNS-327"; then
 	sed -i 's/^#*[[:space:]]*\(.*dns320.*\)/#\1/' /etc/inittab
 	kill -1 1
 fi

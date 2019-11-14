@@ -31,7 +31,7 @@ flash_error() {
 	echo "none" > /tmp/sys/power_led/trigger
 	echo "Failed</p><br><p>You can repeat the fw download and firmware upgrade using HTTP<br>
 	after stopping all running processes (System->Utilities->Services, StopAll)<br>or \"TryIt\" another firmware, but<br><strong><span class=\"error\">don't reboot or poweroff the box until success</span></strong><br> or you will need to buy and solder a serial cable into the box to make it work again.<br></p><pre>$1</pre></body></html>"
-	rcsysctrl start
+	rcsysctrl start >& /dev/null
 	exit 1
 }
 
@@ -51,11 +51,11 @@ nor_flash() {
 	sz=$(stat -t $1 | cut -d" " -f2)
 	tm=$(expr $sz / 75126 + 1); tm2=$(expr $tm \* 25 / 10)
 	wait_count_start "<p>Flashing $3, it should take between $tm and $tm2 seconds"
-	cat $1 > /dev/mtdblock${2:3} # use block device, no need to erase (no mtd-utils) 
+	cat $1 > /dev/$2 
 	wait_count_stop
 
 	echo "Verifying... "
-	sync
+	sync; echo 3 >/proc/sys/vm/drop_caches # shouldn't be needed here
 	TF=$(mktemp)
 	dd if=/dev/$2 of=$TF bs=$sz count=1 >& /dev/null
 	if ! cmp $1 $TF >& /dev/null; then flash_error; fi
@@ -64,14 +64,24 @@ nor_flash() {
 }
 
 nand_flash() {
-	echo "<p>$3: Erasing...&nbsp;"
-	if ! res=$(flash_erase -q /dev/$2 0 0 2>&1); then flash_error "flash_erase: $res"; fi
-	echo "flashing...&nbsp;"
-	if ! res=$(nandwrite -qp /dev/$2 $1 2>&1); then flash_error "nandwrite: $res"; fi
-	echo "verifying...&nbsp;"
-	TF=$(mktemp)
 	sz=$(stat -t $1 | cut -d" " -f2)
+	ebs=$(cat /sys/class/mtd/$sqimage_mtd/erasesize)
+	bbc=$(cat /sys/class/mtd/$sqimage_mtd/bad_blocks)
+	ebc=$(expr $(cat /sys/class/mtd/$sqimage_mtd/size) / $ebs) # device erase block count
+	ecnt=$(expr \( $sz + $ebs - 1 \) / $ebs + $bbc) # ceil(sz/ebs) + possible bad blocks
+	if test $ecnt -ge $ebc; then ecnt=0; fi	# full device
+	
+	echo "<p>$3: Erasing $ecnt blocks...&nbsp;"
+	if ! res=$(flash_erase -q /dev/$2 0 $ecnt 2>&1); then flash_error "flash_erase: $res"; fi
+	
+	echo "flashing $sz bytes...&nbsp;"
+	if ! res=$(nandwrite -qmp /dev/$2 $1 2>&1); then flash_error "nandwrite: $res"; fi
+	
+	echo "verifying...&nbsp;"
+	sync; echo 3 >/proc/sys/vm/drop_caches # shouldn't be needed here
+	TF=$(mktemp)
 	if ! res=$(nanddump -ql $sz -f $TF /dev/$2 2>&1); then flash_error "nanddump: $res"; fi
+	# mtd-utils-1.5.0 nanddump dumps in page size blocks, mtd-utils-2.0.2 is OK 
 	if ! dd if=$TF bs=$sz count=1 2> /dev/null | cmp $1 >& /dev/null; then flash_error "cmp:"; fi
 	echo "OK</p>"
 	rm -f $TF
@@ -130,7 +140,7 @@ elif test "$flash" = "FlashIt"; then
 		initramfs_mtd=mtd3
 		defaults_mtd=mtdblock0
 		sqimage_mtd=""
-	elif grep -qE 'DNS-327L|DNS-320-[AB]x|DNS-320L-Ax|DNS-325-Ax' /tmp/board; then
+	elif grep -qE 'DNS-327L|DNS-320-[AB]x|DNS-320L-Ax|DNS-325-Ax|DNR-322L-Ax' /tmp/board; then
 		kernel_mtd=mtd1
 		initramfs_mtd=mtd2
 		sqimage_mtd=mtd3

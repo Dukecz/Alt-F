@@ -124,20 +124,26 @@ $(PYTHON_DIR)/.patched: $(PYTHON_DIR)/.unpacked
 	toolchain/patch-kernel.sh $(PYTHON_DIR) package/python/ python-$(PYTHON_VERSION_MAJOR)-\*.patch
 	touch $@
 
-$(PYTHON_DIR)/.hostpython: $(PYTHON_DIR)/.patched
+#			./configure --prefix=/usr --libdir=/usr/lib --sysconfdir=/etc --disable-shared; \
+
+$(PYTHON_DIR)/.hostpython: $(PYTHON_DIR)/.patched openssl-host
 	$(call MESSAGE,"Building python for the host")
+	# This needs openssl-1.0.0 and openssl-1.0.0-devel installed on system,
+	# removing the default openssl-1.1.0 install; the removal will remove also
+	# ca-certificates-mozilla and ca-certificates wich must be reinstalled.
+	# after the build reinstall openssl-1.1.0 and openssl-1.1.0-devel
 	(cd $(PYTHON_DIR); rm -rf config.cache; \
-		./configure --prefix=/usr --libdir=/usr/lib --sysconfdir=/etc --disable-shared; \
+		./configure --prefix=$(HOST_DIR)/usr --libdir=$(HOST_DIR)/usr/lib --includedir=$(HOST_DIR)/usr/include --sysconfdir=$(HOST_DIR)/usr/etc --disable-shared; \
 		$(MAKE) python Parser/pgen; \
 		mv python hostpython;  \
 		mv Parser/pgen Parser/hostpgen; \
 		PYTHON_MODULES_INCLUDE="$(HOST_DIR)/usr/include" \
-		PYTHON_MODULES_LIB="$(HOST_DIR)/lib $(HOST_DIR)/usr/lib" \
+		PYTHON_MODULES_LIB="$(HOST_DIR)/usr/lib" \
 		PYTHON_DISABLE_MODULES="$(BR2_PYTHON_DISABLED_MODULES)" \
-		$(MAKE) all install DESTDIR=$(HOST_DIR); \
+		$(MAKE1) install; \
 		$(MAKE) -i distclean \
 	)
-	# install pip (pip installs setuptools by default)
+	# install pip (pip installs setuptools by default).
 	LD_LIBRARY_PATH=$(HOST_DIR)/usr/lib/ $(HOST_DIR)/usr/bin/python $(DL_DIR)/$(PYTHON_PIP_SOURCE)
 	touch $@
 
@@ -250,6 +256,7 @@ python-clean:
 	rm -f $(PYTHON_DIR)/.configured $(TARGET_DIR)/$(PYTHON_TARGET_BINARY)
 	-rm -rf $(TARGET_DIR)/usr/lib/python* $(TARGET_DIR)/usr/include/python*
 	-rm -f $(STAGING_DIR)/usr/lib/libpython$(PYTHON_VERSION_MAJOR).so
+	-rm -rf $(HOST_DIR)/usr/lib/python* $(HOST_DIR)/usr/include/python* $(HOST_DIR)/usr/bin/python* 
 
 python-dirclean:
 	rm -rf $(PYTHON_DIR)

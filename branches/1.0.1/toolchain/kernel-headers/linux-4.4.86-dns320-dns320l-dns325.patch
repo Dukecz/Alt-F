@@ -403,7 +403,7 @@
  	};
 --- linux-4.4.22-orig/arch/arm/boot/dts/Makefile	2014-12-07 22:21:05.000000000 +0000
 +++ linux-4.4.22/arch/arm/boot/dts/Makefile	2015-10-28 16:51:26.150243368 +0000
-@@ -159,7 +159,9 @@
+@@ -159,7 +159,10 @@
  	kirkwood-d2net.dtb \
  	kirkwood-db-88f6281.dtb \
  	kirkwood-db-88f6282.dtb \
@@ -411,7 +411,120 @@
 -	kirkwood-dns320.dtb \
 +	kirkwood-dns320-a.dtb \
 +	kirkwood-dns320-b.dtb \
++	kirkwood-dnr322l-a.dtb \
 +	kirkwood-dns320l.dtb \
  	kirkwood-dns325.dtb \
  	kirkwood-dockstar.dtb \
  	kirkwood-dreamplug.dtb \
+--- /dev/null	2019-10-31 18:07:53.340009124 +0000
++++ linux-4.4.22/arch/arm/boot/dts/kirkwood-dnr322l-a.dts	2019-10-31 18:12:30.558495082 +0000
+@@ -0,0 +1,109 @@
++/dts-v1/;
++
++#include "kirkwood-dnskw.dtsi"
++
++/ {
++	model = "D-Link DNR-322L-rev-Ax NAS";
++	compatible = "dlink,dnr-322l-a", "dlink,dns-320-a", "dlink,dns-320", "dlink,dns-kirkwood", "marvell,kirkwood-88f6281", "marvell,kirkwood";
++
++	memory {
++		device_type = "memory";
++		reg = <0x00000000 0x8000000>;
++	};
++
++	chosen {
++		bootargs = "console=ttyS0,115200n8 root=/dev/ram0 init=/init earlyprintk";
++		linux,stdout-path = &uart0;
++	};
++
++	gpio-leds {
++		compatible = "gpio-leds";
++		pinctrl-0 = <&pmx_led_power &pmx_led_red_usb_320
++			     &pmx_led_red_left_hdd &pmx_led_red_right_hdd
++			     &pmx_led_white_usb>;
++		pinctrl-names = "default";
++
++		blue-power {
++			label = "dns320:blue:power";
++			gpios = <&gpio0 26 GPIO_ACTIVE_LOW>;
++			default-state = "timer";
++		};
++		blue-usb {
++			label = "dns320:blue:usb";
++			gpios = <&gpio1 11 GPIO_ACTIVE_LOW>;
++		};
++		orange-l_hdd {
++			label = "dns320:orange:l_hdd";
++			gpios = <&gpio0 28 GPIO_ACTIVE_LOW>;
++		};
++		orange-r_hdd {
++			label = "dns320:orange:r_hdd";
++			gpios = <&gpio0 27 GPIO_ACTIVE_LOW>;
++		};
++		orange-usb {
++			label = "dns320:orange:usb";
++			gpios = <&gpio1 3 GPIO_ACTIVE_LOW>; /* GPIO 35 */
++		};
++	};
++
++	ocp@f1000000 {
++		uart0: serial@12000 {
++			status = "okay";
++		};
++
++		uart1: serial@12100 {
++			status = "okay";
++		};
++	};
++};
++
++&nand {
++	status = "okay";
++	chip-delay = <35>;
++
++	partition@0 {
++		label = "u-boot";
++		reg = <0x0000000 0x100000>;
++		read-only;
++	};
++
++	partition@100000 {
++		label = "uImage";
++		reg = <0x0100000 0x500000>;
++	};
++
++	partition@600000 {
++		label = "ramdisk";
++		reg = <0x0600000 0x500000>;
++	};
++
++	/* those nodes are inherited from kirkwood-dnskw.dtsi but are incorrect for this board */
++	/delete-node/ partition@b00000;
++	/delete-node/ partition@7100000;
++	/delete-node/ partition@7b00000;
++	
++	partition@b00000 {
++		label = "image";
++		reg = <0x0b00000 0x4600000>;
++	};
++
++	partition@6f00000 {
++		label = "mini firmware";
++		reg = <0x6f00000 0xa00000>;
++	};
++
++	partition@7900000 {
++		label = "config";
++		reg = <0x7900000 0x500000>;
++	};
++
++	partition@7e00000 {
++		label = "my-dlink";
++		reg = <0x7e00000 0x200000>;
++	};
++
++	partition@5100000 {
++		label = "nuuo package";
++		reg = <0x5100000 0x1E00000>;
++	};
++};
