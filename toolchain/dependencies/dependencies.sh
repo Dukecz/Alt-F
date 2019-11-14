@@ -275,6 +275,18 @@ echo "bc installed:					Ok"
 
 #############################################################
 #
+# check build system 'bc'
+#
+#############################################################
+if ! which bc > /dev/null ; then
+	echo "bc installed:					FALSE"
+	/bin/echo -e "\n\nYou must install 'bc' on your build machine\n";
+	exit 1;
+fi;
+echo "bc installed:					Ok"
+
+#############################################################
+#
 # check build system 'flex'
 #
 #############################################################
