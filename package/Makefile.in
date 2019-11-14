@@ -188,8 +188,8 @@ INSTALL:=$(shell which install || type -p install)
 FLEX:=$(shell which flex || type -p flex)
 BISON:=$(shell which bison || type -p bison)
 
-HOST_CFLAGS   += -I$(HOST_DIR)/include -I$(HOST_DIR)/usr/include
-HOST_CXXFLAGS += -I$(HOST_DIR)/include -I$(HOST_DIR)/usr/include
+HOST_CFLAGS   += -fgnu89-inline -I$(HOST_DIR)/include -I$(HOST_DIR)/usr/include
+HOST_CXXFLAGS += -fgnu89-inline -I$(HOST_DIR)/include -I$(HOST_DIR)/usr/include
 HOST_LDFLAGS  += -L$(HOST_DIR)/lib -L$(HOST_DIR)/usr/lib
 HOST_RPATH = -Wl,-rpath,$(HOST_DIR)/lib -Wl,-rpath,$(HOST_DIR)/usr/lib
 HOST_PATH=$(HOST_DIR)/bin:$(HOST_DIR)/usr/bin:$(PATH)

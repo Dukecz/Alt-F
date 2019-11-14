@@ -5,8 +5,9 @@
 #############################################################
 
 IPTRAF_VERSION:=3.0.0
-IPTRAF_SOURCE:=iptraf-$(IPTRAF_VERSION).tar.gz
-IPTRAF_SITE:=ftp://iptraf.seul.org/pub/iptraf
+IPTRAF_SOURCE:=iptraf_$(IPTRAF_VERSION).orig.tar.gz
+#IPTRAF_SITE:=ftp://iptraf.seul.org/pub/iptraf
+IPTRAF_SITE:=http://http.debian.net/debian/pool/main/i/iptraf
 IPTRAF_DIR:=$(BUILD_DIR)/iptraf-$(IPTRAF_VERSION)
 IPTRAF_AUTORECONF:=NO
 IPTRAF_INSTALL_STAGING:=NO

@@ -4,33 +4,34 @@
 #
 #############################################################
 LIBUSB_VERSION:=0.1.12
-LIBUSB_PATCH_FILE:=libusb_$(LIBUSB_VERSION)-10.diff.gz
+#LIBUSB_PATCH_FILE:=libusb_$(LIBUSB_VERSION)-10.diff.gz
 LIBUSB_SOURCE:=libusb_$(LIBUSB_VERSION).orig.tar.gz
-LIBUSB_SITE:=http://snapshot.debian.org/archive/debian/20080427T000000Z/pool/main/libu/libusb
+LIBUSB_SITE:=$(BR2_DEBIAN_MIRROR)/debian/pool/main/libu/libusb
 LIBUSB_DIR:=$(BUILD_DIR)/libusb-$(LIBUSB_VERSION)
 LIBUSB_CAT:=$(ZCAT)
 LIBUSB_BINARY:=usr/lib/libusb.so
 
-ifneq ($(LIBUSB_PATCH_FILE),)
-LIBUSB_PATCH=$(DL_DIR)/$(LIBUSB_PATCH_FILE)
-$(LIBUSB_PATCH):
-	$(call DOWNLOAD,$(LIBUSB_SITE),$(LIBUSB_PATCH_FILE))
-endif
-$(DL_DIR)/$(LIBUSB_SOURCE): $(LIBUSB_PATCH)
+#ifneq ($(LIBUSB_PATCH_FILE),)
+#LIBUSB_PATCH=$(DL_DIR)/$(LIBUSB_PATCH_FILE)
+#$(LIBUSB_PATCH):
+#	$(call DOWNLOAD,$(LIBUSB_SITE),$(LIBUSB_PATCH_FILE))
+#endif
+#$(DL_DIR)/$(LIBUSB_SOURCE): $(LIBUSB_PATCH)
+$(DL_DIR)/$(LIBUSB_SOURCE):
 	$(call DOWNLOAD,$(LIBUSB_SITE),$(LIBUSB_SOURCE))
 	touch -c $@
 
-libusb-source: $(DL_DIR)/$(LIBUSB_SOURCE) $(LIBUSB_PATCH)
+libusb-source: $(DL_DIR)/$(LIBUSB_SOURCE)
 
 libusb-unpacked: $(LIBUSB_DIR)/.unpacked
 $(LIBUSB_DIR)/.unpacked: $(STAMP_DIR)/host_autoconf_installed $(STAMP_DIR)/host_automake_installed $(STAMP_DIR)/host_libtool_installed $(DL_DIR)/$(LIBUSB_SOURCE)
 	$(LIBUSB_CAT) $(DL_DIR)/$(LIBUSB_SOURCE) | tar -C $(BUILD_DIR) $(TAR_OPTIONS) -
-ifneq ($(LIBUSB_PATCH_FILE),)
-	(cd $(LIBUSB_DIR) && $(LIBUSB_CAT) $(LIBUSB_PATCH) | patch -p1)
-endif
-	toolchain/patch-kernel.sh $(LIBUSB_DIR) package/libusb/ libusb-$(LIBUSB_VERSION)\*.patch*
-	$(SED) 's,^all:.*,all:,g' $(LIBUSB_DIR)/tests/Makefile.in
-	$(SED) 's,^install:.*,install:,g' $(LIBUSB_DIR)/tests/Makefile.in
+#ifneq ($(LIBUSB_PATCH_FILE),)
+#	(cd $(LIBUSB_DIR) && $(LIBUSB_CAT) $(LIBUSB_PATCH) | patch -p1)
+#endif
+	toolchain/patch-kernel.sh $(LIBUSB_DIR) package/libusb/ libusb-$(LIBUSB_VERSION)\*.patch
+	#$(SED) 's,^all:.*,all:,g' $(LIBUSB_DIR)/tests/Makefile.in
+	#$(SED) 's,^install:.*,install:,g' $(LIBUSB_DIR)/tests/Makefile.in
 	$(CONFIG_UPDATE) $(LIBUSB_DIR)
 	cd $(LIBUSB_DIR) && $(AUTORECONF)
 	touch $@

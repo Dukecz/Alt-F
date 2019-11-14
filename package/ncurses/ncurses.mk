@@ -42,6 +42,12 @@ $(NCURSES_DIR)/.patched: $(DL_DIR)/$(NCURSES_SOURCE)
 	$(CONFIG_UPDATE) $(NCURSES_DIR)
 	touch $@
 
+#$(NCURSES_HOST_DIR)/.stamp_host_configured: $(NCURSES_HOST_DIR)/.stamp_host_extracted:
+#	$(NCURSES_CAT) $(DL_DIR)/$(NCURSES_SOURCE) | tar -C $(BUILD_DIR) $(TAR_OPTIONS) -
+#	toolchain/patch-kernel.sh $(NCURSES_HOST_DIR) package/ncurses/ ncurses\*.patch
+#	$(CONFIG_UPDATE) $(NCURSES_HOST_DIR)
+#	touch $@
+
 $(NCURSES_DIR)/.configured: $(NCURSES_DIR)/.patched
 	(cd $(NCURSES_DIR); rm -rf config.cache; \
 		BUILD_CC="$(HOSTCC)" \
@@ -154,9 +160,13 @@ $(TARGET_DIR)/usr/lib/libncurses.a: $(NCURSES_DIR)/lib/libncurses.a
 	-$(STRIPCMD) $(STRIP_STRIP_UNNEEDED) $(TARGET_DIR)/usr/lib/libncurses.so.$(NCURSES_VERSION)
 	touch -c $@
 
-NCURSES_HOST_CONF_OPT = --with-shared
+NCURSES_HOST_CONF_OPT = --with-shared --without-cxx-binding
 
 $(eval $(call AUTOTARGETS_HOST,package,ncurses))
+
+$(NCURSES_HOST_HOOK_POST_EXTRACT):
+	toolchain/patch-kernel.sh $(NCURSES_HOST_DIR) package/ncurses ncurses\*.patch
+	touch $@
 
 $(NCURSES_HOST_HOOK_POST_INSTALL):
 	$(SED) 's^prefix="^prefix="$(HOST_DIR)^' $(HOST_DIR)/usr/bin/ncurses5-config

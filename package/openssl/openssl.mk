@@ -46,6 +46,8 @@ OPENSSL_CFLAGS += $(OPENSSL_CONF_OPT)
 
 $(eval $(call AUTOTARGETS,package,openssl))
 
+$(eval $(call AUTOTARGETS_HOST,package,openssl))
+
 # load cryptodev.ko mv_cesa.ko
 # MV-CESA:Could not register sha1 driver FIXME
 # MV-CESA:Could not register hmac-sha1 driver FIXME
@@ -61,6 +63,16 @@ $(eval $(call AUTOTARGETS,package,openssl))
 # / # openssl speed -evp sha1
 # sha1               575.41k     1823.25k     4580.09k     7323.65k     8909.83k (no mv_cesa)
 # sha1               541.06k     1754.84k     4469.86k     7254.65k     8866.47k (mv_cesa)
+			
+$(OPENSSL_HOST_CONFIGURE):
+	(cd $(OPENSSL_HOST_DIR); \
+		./config \
+			--prefix=$(HOST_DIR)/usr \
+			--openssldir=$(HOST_DIR)/usr/etc/ssl \
+			threads shared no-zlib \
+	)
+	$(MAKE) depend
+	touch $@
 
 $(OPENSSL_TARGET_CONFIGURE):
 	(cd $(OPENSSL_DIR); \

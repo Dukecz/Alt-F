@@ -17,7 +17,7 @@ AMULE_INSTALL_TARGET_OPT = DESTDIR=$(TARGET_DIR) install
 
 AMULE_CONF_OPT = --enable-optimize \
 	--with-wx-prefix=$(STAGING_DIR)/usr --with-crypto-prefix=$(STAGING_DIR)/usr \
-	--disable-monolithic --disable-amule-gui \
+	--with-gdlib-prefix=$(STAGING_DIR)/usr --disable-monolithic --disable-amule-gui \
 	--disable-wxcas --enable-cas --disable-alc --enable-alcc \
 	--enable-fileview --enable-xas --enable-amulecmd --enable-amule-daemon --enable-webserver
 

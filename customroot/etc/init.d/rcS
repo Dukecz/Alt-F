@@ -49,6 +49,8 @@ elif grep -q 'DNS-320-rev-Ax' /proc/device-tree/model 2> /dev/null; then
 	board="DNS-320-Ax"
 elif grep -q 'DNS-320-rev-Bx' /proc/device-tree/model 2> /dev/null; then
 	board="DNS-320-Bx"
+elif grep -q 'DNR-322L-rev-Ax' /proc/device-tree/model 2> /dev/null; then
+	board="DNR-322L-Ax"
 elif grep -q 'DNS-325-rev-Ax' /proc/device-tree/model 2> /dev/null; then
 	board="DNS-325-Ax"
 elif grep -q 'DNS-327L-rev-Ax' /proc/device-tree/model 2> /dev/null; then
@@ -73,13 +75,13 @@ elif echo $board | grep -qE "DNS-321|DNS-323"; then
 	ln -sf "/sys/class/leds/left:amber" /tmp/sys/left_led
 	ln -sf "/sys/class/leds/right:amber" /tmp/sys/right_led
 
-elif echo $board | grep -qE "DNS-320|DNS-325|DNS-327L"; then
+elif echo $board | grep -qE "DNR-322L|DNS-320|DNS-325|DNS-327L"; then
 	kernel_mtd=/dev/mtd1; kernel_mn="90 2"
 	config_mtd=/dev/mtdblock5; config_mn="31 5"
 
 	# Tell PMU to turn back on after a power failure
 	# From http://jamie.lentin.co.uk/devices/dlink-dns325/userland-configuration/
-	if test $board = "DNS-320-Ax" -o $board = "DNS-325-Ax"; then
+	if test $board = "DNR-322L-Ax" -o $board = "DNS-320-Ax" -o $board = "DNS-325-Ax"; then
 		echo 37 > /sys/class/gpio/export
 		echo out > /sys/class/gpio/gpio37/direction
 		echo 1 > /sys/class/gpio/gpio37/value
@@ -126,7 +128,7 @@ elif echo $board | grep -qE "DNS-320|DNS-325|DNS-327L"; then
 	# the dns320-temp.sh/dns320l-daemon needs ttyS1, not yet available
 	if ! test -e /dev/ttyS1; then mknod /dev/ttyS1 c 4 65; fi
 
-	if test $board = "DNS-320-Ax"; then
+	if test $board = "DNS-320-Ax" -o $board = "DNR-322L-Ax"; then
 		ln -sf "/sys/class/leds/dns320:blue:power" /tmp/sys/power_led
 		ln -sf "/sys/class/leds/dns320:orange:l_hdd" /tmp/sys/left_led
 		ln -sf "/sys/class/leds/dns320:orange:r_hdd" /tmp/sys/right_led

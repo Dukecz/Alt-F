@@ -6,7 +6,7 @@
 
 NMAP_VERSION:=5.51
 NMAP_SOURCE:=nmap-$(NMAP_VERSION).tar.bz2
-NMAP_SITE:=http://nmap.org/dist
+NMAP_SITE:=http://nmap.org/dist-old
 
 NMAP_DIR:=$(BUILD_DIR)/nmap-$(NMAP_VERSION)
 NMAP_INSTALL_STAGING = NO

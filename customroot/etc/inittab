@@ -19,7 +19,7 @@
 # Put a getty on the serial port
 ttyS0::respawn:/sbin/getty -n -l /bin/sh -L ttyS0 115200 vt100
 
-# DNS-320 temperature reading
+# DNS-320/DNR-322L temperature reading
 #null::respawn:/usr/sbin/dns320-temp.sh
 
 # DNS-320L MCU daemon

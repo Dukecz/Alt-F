@@ -71,11 +71,29 @@ $(PERL_DIR)/.stamp_installed: $(PERL_DIR)/.stamp_build
 # perl for the host
 
 PERL_HOST_INSTALL_OPT = install.perl
+PERL_HOST_DEPENDENCIES = expat-host
 
 $(eval $(call AUTOTARGETS_HOST,package,perl))
 
 $(PERL_HOST_CONFIGURE):
 	( cd $(PERL_HOST_DIR); ./configure.gnu --prefix=$(HOST_DIR)/usr )
+	touch $@
+
+# hack for building XML::Parser for the host (needed by avahi)
+PERL_XML_PARSER_VERSION=2.44
+PERL_XML_PARSER_SITE=https://cpan.metacpan.org/authors/id/T/TO/TODDR/
+PERL_XML_PARSER_SOURCE=XML-Parser-$(PERL_XML_PARSER_VERSION).tar.gz
+
+$(PERL_HOST_HOOK_POST_INSTALL):
+	$(call DOWNLOAD,$(PERL_XML_PARSER_SITE),$(PERL_XML_PARSER_SOURCE))
+	$(ZCAT) $(DL_DIR)/$(PERL_XML_PARSER_SOURCE) | tar -C $(BUILD_DIR) $(TAR_OPTIONS) -
+	(cd $(BUILD_DIR)/XML-Parser-$(PERL_XML_PARSER_VERSION) ; \
+		$(HOST_CONFIGURE_OPTS) perl Makefile.PL \
+			EXPATLIBPATH=$(HOST_DIR)/usr/lib \
+			EXPATINCPATH=$(HOST_DIR)/usr/include \
+	)
+	$(HOST_MAKE_ENV) $(MAKE) -C $(BUILD_DIR)/XML-Parser-$(PERL_XML_PARSER_VERSION)
+	$(HOST_MAKE_ENV) $(MAKE) -C $(BUILD_DIR)/XML-Parser-$(PERL_XML_PARSER_VERSION) install
 	touch $@
 
 #####################

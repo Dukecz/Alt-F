@@ -11,6 +11,7 @@ PHP_SOURCE = php-$(PHP_VERSION).tar.bz2
 PHP_INSTALL_STAGING = YES
 PHP_INSTALL_STAGING_OPT = INSTALL_ROOT=$(STAGING_DIR) install
 PHP_INSTALL_TARGET_OPT = INSTALL_ROOT=$(TARGET_DIR) install
+PHP_HOST_INSTALL_OPT = INSTALL_ROOT=$(HOST_DIR) install
 PHP_LIBTOOL_PATCH = NO
 PHP_DEPENDENCIES = uclibc
 
@@ -51,9 +52,10 @@ endif
 
 ifeq ($(BR2_PACKAGE_PHP_EXT_PHAR),y)
 	PHP_CONF_OPT += --enable-phar=shared,${STAGING_DIR}/usr
-	PHP_DEPENDENCIES += zlib bzip2
-	# FIXME:php-hosthost should be build with phar extension enabled, cross-compiling phar extension needs it
-	PHP_MAKE_OPT = PHP_EXECUTABLE=/usr/bin/php
+	PHP_DEPENDENCIES += zlib bzip2 php-host
+	# FIXME:php-host should be build when phar extension is enabled, cross-compiling phar extension needs it
+	PHP_HOST_CONF_OPT += --disable-dom --disable-xml --disable-libxml --disable-simplexml -disable-xmlreader --disable-xmlwriter --without-pear
+	PHP_MAKE_OPT = PHP_EXECUTABLE=$(HOST_DIR)/usr/bin/php
 endif
 
 ifeq ($(BR2_PACKAGE_PHP_EXT_LIBICONV),y)
@@ -252,9 +254,11 @@ PHP_CONF_OPT += --enable-pdo=shared \
 PHP_DEPENDENCIES += mysql sqlite
 endif
 
+$(eval $(call AUTOTARGETS_HOST,package,php)) # host php needed by PHAR
 $(eval $(call AUTOTARGETS,package,php))
 
 $(PHP_HOOK_POST_EXTRACT):
+	#if ! which php; then echo -e "\n\n*** You have to INSTALL PHP on the host system *** \n\n"; exit 1; fi
 	sed -i '/unset.*ac_cv_func_dlopen/d' $(PHP_DIR)/configure
 	touch $@
 	
@@ -284,3 +288,6 @@ $(PHP_TARGET_UNINSTALL):
 	rm -f $(TARGET_DIR)/etc/php.ini
 	rm -f $(TARGET_DIR)/usr/bin/php*
 	rm -f $(PHP_TARGET_INSTALL_TARGET) $(PHP_HOOK_POST_INSTALL)
+
+$(PHP_HOST_HOOK_POST_CONFIGURE):	
+	sed -i 's|@$$(mkinstalldirs) $$(INSTALL_ROOT)$$(mandir)/man1|-&|' $(PHP_HOST_DIR)/Makefile

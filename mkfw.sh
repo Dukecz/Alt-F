@@ -120,41 +120,44 @@ esac
 # DNS320-A		0		8			7			1/2		0		4
 # DNS320-B		0		8			c			1		1		5
 # DNS320L		0		8			b			1		1		6
+# DNS327L		0		8			d			1		1		7
+# DNR322L		1		8			2			1		1		8
+#
 # Alt-F-0.1B	1		2			3			4		5		0
 # Alt-F-0.1RC	7		1			1			1		4		0
 
 # FIXME: use associative arrays
 # the brand models
-name=(DNS-323-rev-AxBxCx CH3SNAS DUO-35LR DNS-321-rev-Ax DNS-343 DNS-325-rev-Ax DNS-320-rev-Ax DNS-320-rev-Bx DNS-320L-rev-Ax DNS-327L-rev-Ax)
-working=(y y y y n y y y y y)
+name=(DNS-323-rev-AxBxCx CH3SNAS DUO-35LR DNS-321-rev-Ax DNS-343 DNS-325-rev-Ax DNS-320-rev-Ax DNS-320-rev-Bx DNS-320L-rev-Ax DNS-327L-rev-Ax DNR-322L-rev-Ax)
+working=(y y y y n y y y y y y)
 
 # the buildroot boards .config used
 # better call it arch: orion (dns321/323), kirkwood(dns320/320L/325), armada-370(dns-327L)
-hwboard=(dns323 dns323 dns323 dns323 dns343 dns325 dns325 dns325 dns325 dns327)
+hwboard=(dns323 dns323 dns323 dns323 dns343 dns325 dns325 dns325 dns325 dns327 dns325)
 
 # the firmware file signatures
-prod=( 7 7 7 10 9 0 0  0  0 0)
-cust=( 1 2 3  1 1 8 8  8  8 8)
-model=(1 1 1  1 1 5 7 12 11 13)
-sub=(  1 1 1  2 2 2 2  1  1 1)
-nver=( 4 4 4  1 1 0 0  1  1 1)
-type=( 0 0 0  1 2 3 4  5  6 7)
+prod=( 7 7 7 10 9 0 0  0  0 0 1)
+cust=( 1 2 3  1 1 8 8  8  8 8 8)
+model=(1 1 1  1 1 5 7 12 11 13 2)
+sub=(  1 1 1  2 2 2 2  1  1 1 1)
+nver=( 4 4 4  1 1 0 0  1  1 1 1)
+type=( 0 0 0  1 2 3 4  5  6 7 8)
 
 # the amount of NAND flash bytes that u-boot copies to ram at bootm for each board
 # read the NOTE-2 bellow)
-kernel_max=(1572864 1572864 1572864 1572864 1572864 3145728 3145728 3145728 3145728 3145728)
-initramfs_max=(6488064 6488064 6488064 10485760 14417920 3145728 3145728 3145728 3145728 4194304)
-sqimage_max=(0 0 0 0 0 106954752 106954752 104857600 104857600 81788928)
+kernel_max=(1572864 1572864 1572864 1572864 1572864 3145728 3145728 3145728 3145728 3145728 3145728)
+initramfs_max=(6488064 6488064 6488064 10485760 14417920 3145728 3145728 3145728 3145728 4194304 3145728)
+sqimage_max=(0 0 0 0 0 106954752 106954752 104857600 104857600 81788928 73400320)
 
 # some kernels need a prologue to change the device_id set by the bootloader
 # read NOTE-1 bellow
 #prez=(0606 0606 0606 0606 0606  "" ""  128a 128a)
-prez=(0606 0606 0606 0606 0606  "" "" "" "" "")
+prez=(0606 0606 0606 0606 0606  "" "" "" "" "" "")
 
 DTSDIR=${KERNEL}/arch/arm/boot/dts
 # other kernels needs an epilogue with a hardware device tree description
 #postz=("" "" "" "" "" kirkwood-dns325.dtb kirkwood-dns320.dtb "" "")
-postz=("" "" "" "" "" kirkwood-dns325.dtb kirkwood-dns320-a.dtb kirkwood-dns320-b.dtb kirkwood-dns320l.dtb armada-370-dlink-dns327l.dtb)
+postz=("" "" "" "" "" kirkwood-dns325.dtb kirkwood-dns320-a.dtb kirkwood-dns320-b.dtb kirkwood-dns320l.dtb armada-370-dlink-dns327l.dtb kirkwood-dnr322l-a.dtb)
 
 # NOTE-1: DNS-323/DNS-321:
 # Sets the cpu r1 to the machine ID, overriding the value that u-boot sets there.
