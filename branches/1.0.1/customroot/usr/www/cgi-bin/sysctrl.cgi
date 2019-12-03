@@ -20,7 +20,7 @@ lo_fan=2000
 hi_fan=5000
 hi_temp=50
 fan_mode=0
-if echo "$board" | grep -qE 'DNS-32(0-Ax|0-Bx|0L-Ax|7L-Ax)'; then
+if echo "$board" | grep -qE 'DNS-32(0-Ax|0-Bx|0L-Ax|7L-Ax)|DNR-322L-Ax'; then
 	fan_mode=2
 fi
 hist_temp=1
@@ -116,7 +116,7 @@ case "$board" in
 	EOF
 	;;
 
-	DNS-320-[AB]x|DNS-320L-Ax|DNS-321-Ax|DNS-323-C1|DNS-325-Ax|DNS-327L-Ax)
+	DNR-322L-Ax|DNS-320-[AB]x|DNS-320L-Ax|DNS-321-Ax|DNS-323-C1|DNS-325-Ax|DNS-327L-Ax)
 
 	mktt lofan_tt "The fan turns at low speed at system temperatures lower than this value<br> and at fast speed at higher temperatures"
 	if test -z "$lo_temp"; then lo_temp=45; fi
